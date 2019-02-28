@@ -4,53 +4,22 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
-certifi==2018.11.29       # via requests
+algorithmia-api-client==1.0.1  # via algorithmia
+algorithmia==1.1.4
+certifi==2018.11.29       # via algorithmia-api-client, requests
 chardet==3.0.4            # via requests
 click==6.6                # via flask
+enum34==1.1.6             # via algorithmia
 fbmessenger==5.3.2
-phonenumbers==8.10.3
-fuzzywuzzy==0.17.0
-inflect==2.1.0
-word2number==1.1
-flask-migrate==2.3.1
-flask-sqlalchemy==2.3.2   # via flask-migrate
-flask-script==2.0.6
 flask==1.0
-gast==0.2.0               # via tensorflow
-geopy==1.18.1
-grpcio==1.17.1            # via tensorboard, tensorflow
 gunicorn==19.9.0
-h5py==2.9.0               # via keras, keras-applications
 idna==2.8                 # via requests
 itsdangerous==0.24        # via flask
 jinja2==2.10              # via flask
-jmespath==0.9.3           # via boto3, botocore
-keras-applications==1.0.6  # via keras, tensorflow
-keras-preprocessing==1.0.5  # via keras, tensorflow
-keras==2.2.4
-mako==1.0.7               # via alembic
-markdown==3.0.1           # via tensorboard
-markupsafe==0.23          # via jinja2, mako
-nltk==3.4
-numpy==1.15.4
-pandas==0.23.4
-protobuf==3.6.1           # via tensorboard, tensorflow
-psycopg2-binary==2.7.6.1
-python-dateutil==2.7.5    # via alembic, botocore, pandas
-python-editor==1.0.3      # via alembic
-pytz==2018.7              # via pandas
-pyyaml==3.13              # via keras
-requests==2.21.0          # via fbmessenger
-s3transfer==0.1.13        # via boto3
-scikit-learn==0.20.2      # via sklearn
-scipy==1.2.0              # via keras, scikit-learn
-singledispatch==3.4.0.3   # via nltk
-six==1.12.0               # via absl-py, grpcio, h5py, keras, keras-preprocessing, nltk, protobuf, python-dateutil, singledispatch, tensorboard, tensorflow
-sklearn==0.0
-sqlalchemy==1.2.14        # via alembic, flask-sqlalchemy
-tensorboard==1.12.1       # via tensorflow
-tensorflow==1.12.0
-termcolor==1.1.0          # via tensorflow
-urllib3==1.24.1           # via botocore, requests
-werkzeug==0.14.1          # via flask, tensorboard
-wheel==0.32.3             # via tensorboard, tensorflow
+markupsafe==0.23          # via jinja2
+pillow==5.4.1
+python-dateutil==2.7.5    # via algorithmia-api-client
+requests==2.21.0          # via algorithmia, fbmessenger
+six==1.12.0               # via algorithmia, algorithmia-api-client, python-dateutil
+urllib3==1.24.1           # via algorithmia-api-client, requests
+werkzeug==0.14.1          # via flask

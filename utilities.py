@@ -19,6 +19,7 @@ def classify(message_text):
     msg=message_text.lower().strip()
     if(msg in greeting) or (msg=="help"):
         # Get the response
+        pass
     return
 
 def upload_image(url):
