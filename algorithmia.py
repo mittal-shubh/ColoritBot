@@ -11,30 +11,30 @@ import utilities
 import ray
 ray = ray.init()
 
+@ray.remote
+def waiting_message(user_id):
+	if user_id:
+		utilities.send_message(user_id, {"text": "It is coming!"})
+		time.sleep(2)
+		utilities.send_message(user_id, {"text": "I beg you few more seconds."})
+	return
+
+@ray.remote
+def runcoloritalgo(input):
+	result = algo.pipe(input).result  # Outputs the image url
+	print(result)
+	#image_type = mimetypes.guess_type(urllib.parse.urlparse(result['output']).path)[0].split("/")[1]
+	t800Bytes = client.file(result["output"]).getBytes()
+	return t800Bytes
+
 class parallel_processing:
 	def __init__(self, user_id, input):
 		self.user_id = user_id
 		self.input = input
 
-	@ray.remote
-	def waiting_message(self):
-		if self.user_id:
-			utilities.send_message(self.user_id, {"text": "It is coming!"})
-			time.sleep(2)
-			utilities.send_message(self.user_id, {"text": "I beg you few more seconds."})
-		return
-
-	@ray.remote
-	def runcoloritalgo(self):
-		result = algo.pipe(self.input).result  # Outputs the image url
-		print(result)
-		#image_type = mimetypes.guess_type(urllib.parse.urlparse(result['output']).path)[0].split("/")[1]
-		t800Bytes = client.file(result["output"]).getBytes()
-		return t800Bytes
-
 	def run(self):
-		result1 = waiting_message.remote()
-		result2 = runcoloritalgo.remote()
+		result1 = waiting_message.remote(self.user_id)
+		result2 = runcoloritalgo.remote(self.input)
 		a, t800Bytes = ray.get([result1, result2])
 		return t800Bytes
 
