@@ -11,6 +11,7 @@ import fbmessenger
 from fbmessenger import attachments, templates, elements
 from fbmessenger.thread_settings import PersistentMenu, PersistentMenuItem, MessengerProfile
 import algorithmia
+import db_ext
 
 greeting=(["hi","hey","hello","hola"])
 def classify(message_text):
