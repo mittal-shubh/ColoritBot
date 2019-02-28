@@ -287,5 +287,5 @@ def bot_prev_message(user_id, size=None):
 def user_last_message(user_id):
     query = sql.SQL('SELECT {cols} FROM user_events WHERE {ukey1} = %s ORDER BY {okey} DESC;').format(
         cols=sql.Identifier('time'), ukey1=sql.Identifier('user_id'), okey=sql.Identifier('time'))
-    last_message = fetch_column(query=query, var=(user_id))
+    last_message = fetch_column(query=query, var=(user_id,))
     return last_message
