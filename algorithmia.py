@@ -119,11 +119,13 @@ def colorit(algorithm='deeplearning/ColorfulImageColorization/1.1.5', local_file
 			#processor = parallel_processing(user_id, input)
 			#t800Bytes = processor.run()
 			waiting_message(user_id)
-			t800Bytes = runcoloritalgo(algo, input)
+			result = algo.pipe(input).result
+			print(result)
+			t800Bytes = client.file(result["output"]).getBytes()
 			Image.open(BytesIO(t800Bytes)).save(image_path)
 			return file_name
 		else:
-			file_name = algo.pipe(input).result  # Outputs the image url
+			file_name = algo.pipe(input).result
 		return file_name
 	except Exception as e:
 		print('[Error]: '+str(e))
