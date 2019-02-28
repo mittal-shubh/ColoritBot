@@ -8,18 +8,18 @@ from io import BytesIO
 import Algorithmia
 
 def colorit(local_file=None, algorithmia_file=None, image_url=None, image_path=None, user_id=None):
+	print("Coloring It")
 	if local_file:
-		image = local_file
+		im = Image.open(local_file).convert('RGB')
 		input = bytearray(open(local_file, "rb").read())
 	if algorithmia_file:
 		input = {"image": algorithmia_file}
 	if image_url:
 		# Try this: https://scontent.xx.fbcdn.net/v/t1.15752-9/52297953_405991800162283_7056520676215095296_n.jpg?_nc_cat=111&_nc_ad=z-m&_nc_cid=0&_nc_zor=9&_nc_ht=scontent.xx&oh=4a1c6de3a6614aa21f5fe8e20e84f43b&oe=5CE4CA2D
 		response = requests.get(image_url)
-		image = BytesIO(response.content)
+		im = Image.open(BytesIO(response.content)).convert('RGB')
 		input = bytearray(image)
 	if not algorithmia_file:
-		im = Image.open(image).convert('RGB')
 		pix = im.load()
 		image_size = im.size
 		print(image_size)
