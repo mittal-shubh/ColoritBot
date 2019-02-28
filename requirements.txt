@@ -32,3 +32,4 @@ six==1.12.0               # via algorithmia, algorithmia-api-client, python-date
 sqlalchemy==1.2.18        # via alembic, flask-sqlalchemy
 urllib3==1.24.1           # via algorithmia-api-client, requests
 werkzeug==0.14.1          # via flask
+ray==0.6.3

@@ -8,67 +8,124 @@ from PIL import Image
 from io import BytesIO
 import Algorithmia
 import utilities
+import ray
 
-def colorit(local_file=None, algorithmia_file=None, image_url=None, image_path=None, user_id=None):
-	print("Coloring It")
-	if local_file:
+class parallel_processing:
+	def __init__(self, user_id, input):
+		self.ray = ray.init()
+		self.user_id = user_id
+		self.input = input
+
+	@ray.remote
+	def waiting_message(self):
+		if self.user_id:
+			utilities.send_message(self.user_id, {"text": "It is coming!"})
+			time.sleep(2)
+			utilities.send_message(self.user_id, {"text": "I beg you few more seconds."})
+		return
+
+	@ray.remote
+	def runcoloritalgo(self):
+		result = algo.pipe(self.input).result  # Outputs the image url
+		print(result)
+		#image_type = mimetypes.guess_type(urllib.parse.urlparse(result['output']).path)[0].split("/")[1]
+		t800Bytes = client.file(result["output"]).getBytes()
+		return t800Bytes
+
+	def run(self):
+		result1 = waiting_message.remote()
+		result2 = runcoloritalgo.remote()
+		a, t800Bytes = self.ray.get([result1, result2])
+		return t800Bytes
+
+def if_color(local_file=None, image_url=None, get_response=None):
+	if not (get_response or image_url or local_file):
+		print("Provide atleast one of local_file, image_url or get_response attributes.")
+		return
+	if (get_response) and (not image_url) and (not local_file):
+		im = Image.open(BytesIO(get_response)).convert('RGB')
+	elif (local_file) and (not get_response) and (not image_url):
 		im = Image.open(local_file).convert('RGB')
-		input = bytearray(open(local_file, "rb").read())
-	if algorithmia_file:
-		input = {"image": algorithmia_file}
-	if image_url:
-		# Try this: https://scontent.xx.fbcdn.net/v/t1.15752-9/52297953_405991800162283_7056520676215095296_n.jpg?_nc_cat=111&_nc_ad=z-m&_nc_cid=0&_nc_zor=9&_nc_ht=scontent.xx&oh=4a1c6de3a6614aa21f5fe8e20e84f43b&oe=5CE4CA2D
+	elif (image_url) and (not local_file) and (not get_response):
 		response = requests.get(image_url)
 		im = Image.open(BytesIO(response.content)).convert('RGB')
-		input = bytearray(response.content)
-	if not algorithmia_file:
-		pix = im.load()
-		image_size = im.size
-		print(image_size)
-		diff = 0
-		for w in range(image_size[0]):
-			for h in range(image_size[1]):
-				r, g, b = pix[w, h]
-				rg = abs(r-g)
-				gb = abs(g-b)
-				br = abs(b-r)
-				diff += rg+gb+br
-		print(diff)
-		color_factor = float(diff)/(image_size[0]*image_size[1])
+	else:
+		print("Provide only one of the local_file, image_url or get_response attributes.")
+		return
+	pix = im.load()
+	image_size = im.size
+	print(image_size)
+	diff = 0
+	for w in range(image_size[0]):
+		for h in range(image_size[1]):
+			r, g, b = pix[w, h]
+			rg = abs(r-g)
+			gb = abs(g-b)
+			br = abs(b-r)
+			diff += rg+gb+br
+	print(diff)
+	color_factor = float(diff)/(image_size[0]*image_size[1])
 	print(color_factor)
 	if round(color_factor) != 0:
+		return True
+	return False
+
+def get_random_file_name(full_path=None, cwd_rsp_path=None, image_type='png'):
+	if full_path and (not cwd_rsp_path):
+		fp = full_path
+	elif cwd_rsp_path and (not full_path):
+		fp = cwd_rsp_path
+	else:
+		print("Please provide only one of these attributes: [full_path, cwd_rsp_path].")
+		return
+	if not os.path.exists(fp):
+		os.mkdir(fp)
+		print('Directory Created')
+	else:
+		print("Directory Exists")
+	file_name = fp + uuid.uuid4().hex + '.%s' %image_type
+	while os.path.isfile(file_name):
+		print("File (%s) already exists" %file_name)
+		file_name = fp + uuid.uuid4().hex + '.%s' %image_type
+	return file_name
+
+def colorit(algorithm='deeplearning/ColorfulImageColorization/1.1.5', local_file=None, algorithmia_file=None, 
+	image_url=None, image_path=None, user_id=None):
+	print("Coloring It")
+	color = False
+	if (local_file) and (not algorithmia_file) and (not image_url):
+		input = bytearray(open(local_file, "rb").read())
+		color = if_color(local_file=local_file)
+	elif (algorithmia_file) and (not image_url) and (not local_file):
+		input = {"image": algorithmia_file}
+		color = if_color()
+	elif (image_url) and (not local_file) and (not algorithmia_file):
+		# Try this: https://scontent.xx.fbcdn.net/v/t1.15752-9/52297953_405991800162283_7056520676215095296_n.jpg?_nc_cat=111&_nc_ad=z-m&_nc_cid=0&_nc_zor=9&_nc_ht=scontent.xx&oh=4a1c6de3a6614aa21f5fe8e20e84f43b&oe=5CE4CA2D
+		response = requests.get(image_url)
+		input = bytearray(response.content)
+		color = if_color(get_response=response.content)
+	else:
+		print("Provide only one of the local_file, algorithmia_file or image_url attributes.")
+		return
+	if color:
 		return "It's not a black & white image. Provide a black & white one."
-	if image_path:
-		if not os.path.exists("static/colored_images"):
-			os.mkdir("static/colored_images")
-			print('Directory Created')
-		else:
-			print("Directory Exists")
-		#image_type = mimetypes.guess_type(urllib.parse.urlparse(result['output']).path)[0].split("/")[1]
-		image_type = 'png'
-		file_name = "static/colored_images/" + uuid.uuid4().hex + '.%s' %image_type
-		while os.path.isfile(file_name):
-			print("File (%s) already exists" %file_name)
-			file_name = "static/colored_images/" + uuid.uuid4().hex + '.%s' %image_type
-		__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
-		image_path = os.path.join(__location__, file_name)
-		print(image_path)
-	client = Algorithmia.client(os.environ['ALGORITHMIA_KEY'])
-	algo = client.algo('deeplearning/ColorfulImageColorization/1.1.5')
 	try:
-		if user_id:
-			utilities.send_message(user_id, {"text": "It is coming!"})
-			time.sleep(5)
-			utilities.send_message(user_id, {"text": "I beg you few more seconds."})
-		result = algo.pipe(input).result  # Outputs the image url
-		print(result)
-		t800Bytes = client.file(result["output"]).getBytes()
-		if image_path:
+		client = Algorithmia.client(os.environ['ALGORITHMIA_KEY'])
+		algo = client.algo(algorithm)
+		if user_id and image_path:
+			file_name = get_random_file_name(cwd_rsp_path="static/colored_images", image_type='png')
+			image_path=os.path.join(os.path.realpath(os.path.join(os.getcwd(),os.path.dirname(__file__))),file_name)
+			print(image_path)
+			processor = parallel_processing(user_id, input)
+			t800Bytes = parallel_processing.run()
 			Image.open(BytesIO(t800Bytes)).save(image_path)
 			return file_name
+		else:
+			file_name = algo.pipe(input).result  # Outputs the image url
+		return file_name
 	except Exception as e:
 		print('[Error]: '+str(e))
-	return
+		return
 
 '''
 # The .dir() method takes a Data URI path and returns an Algorithmia.datadirectory.DataDirectory object for the child directory.

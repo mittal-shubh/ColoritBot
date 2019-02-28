@@ -7,3 +7,4 @@ Pillow
 Algorithmia
 pytz
 psycopg2-binary
+ray
