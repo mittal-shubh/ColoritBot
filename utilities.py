@@ -4,15 +4,12 @@ import time
 import json
 import re
 import requests
-import uuid
-import mimetypes
-import urllib
+from datetime import datetime
+import pytz
 import fbmessenger
 from fbmessenger import attachments, templates, elements
 from fbmessenger.thread_settings import PersistentMenu, PersistentMenuItem, MessengerProfile
 import algorithmia
-
-__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 
 greeting=(["hi","hey","hello","hola"])
 def classify(message_text):
@@ -33,6 +30,8 @@ def handlePostback(messaging_event):
     payload = messaging_event["postback"]["payload"]
     title = messaging_event["postback"]["title"]
     log(payload)
+    utilities.save_message(messaging_event["sender"]["id"], title, datetime.fromtimestamp(
+        messaging_event['timestamp']/1000).astimezone(pytz.timezone('UTC')))
     attachment = {}
     return
 
@@ -45,28 +44,24 @@ def handleAttachments(messaging_event):
             pass
         elif file["type"] == "image":
             image_url = file['payload']['url']
-            image_type = mimetypes.guess_type(urllib.parse.urlparse(image_url).path)[0].split("/")[1]
-            if not os.path.exists("static/colored_images"):
-                os.mkdir("static/colored_images")
-            file_name = "static/colored_images/" + uuid.uuid4().hex + '.%s' %image_type
-            while os.path.isfile(file_name):
-                file_name = "static/colored_images/" + uuid.uuid4().hex + '.%s' %image_type
-            image_path = os.path.join(__location__, file_name)
-            log(image_path)
-            result = algorithmia.colorit(image_url=image_url, image_path=image_path)
+            save_message(messaging_event["sender"]["id"], image_url, datetime.fromtimestamp(
+                messaging_event['timestamp']/1000).astimezone(pytz.timezone('UTC')))
+            result = algorithmia.colorit(image_url=image_url, image_path=True)
             if isinstance(result, str):
-                log(result)
-                break
-            attachment_id = upload_image(messaging_event['url']+file_name)
-            log(attachment_id)
-            btn = elements.Button(
-                button_type='web_url',
-                title='Web button',
-                url='http://facebook.com'
-                )
-            attachment = attachments.Image(attachment_id=attachment_id)
-            res = templates.MediaTemplate(attachment, buttons=[btn])
-            attachment = res.to_dict()
+                if result == "It's not a black & white image. Provide a black & white one.":
+                    log(result)
+                    break
+                else:
+                    attachment_id = upload_image(messaging_event['url']+result)
+                    log(attachment_id)
+                    btn = elements.Button(
+                        button_type='web_url',
+                        title='Web button',
+                        url='http://facebook.com'
+                        )
+                    attachment = attachments.Image(attachment_id=attachment_id)
+                    res = templates.MediaTemplate(attachment, buttons=[btn])
+                    attachment = res.to_dict()
         else:
             pass
     return attachment
@@ -74,6 +69,9 @@ def handleAttachments(messaging_event):
 def handleFreeText(messaging_event):
     # Send back the message that you don't understand him but can definitely 
     # put colors in his b&w pictures. Send me the image.
+    message_text = messaging_event["message"]["text"] 
+    save_message(messaging_event["sender"]["id"], message_text, datetime.fromtimestamp(
+        messaging_event['timestamp']/1000).astimezone(pytz.timezone('UTC')))
     attachment = {}
     if "text" in messaging_event["message"]:
         pass
@@ -109,6 +107,19 @@ def postRequest(url, dumpData):
             log(str(e))
     else:
         log(r.text)
+    return
+
+def save_message(user_id, message, time=None):
+    log("------Saving the Message------")
+    query = sql.SQL('SELECT {col} FROM user_events WHERE {ukey1} = %s AND {ukey2} = %s;').format(
+        col=sql.Identifier('id'), ukey1=sql.Identifier('user_id'), ukey2=sql.Identifier('time'))
+    message_id = db_ext.fetch_column(query=query, var=(user_id, time))
+    if message_id:
+        db_ext.update_columns('user_events', 'id', message_id[0], list(['message', message]))
+    else:
+        db_ext.insert_values(table="user_events", columns=["user_id", "time"], values=(user_id, time))
+        save_message(user_id, message, time)
+    log("------Message Saved------")
     return
 
 def send_message(user_id, attachment):

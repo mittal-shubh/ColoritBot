@@ -1,5 +1,8 @@
 Flask
+Flask-Migrate
+Flask-Script
 Gunicorn
 fbmessenger
 Pillow
 Algorithmia
+pytz

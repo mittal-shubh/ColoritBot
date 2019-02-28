@@ -1,9 +1,21 @@
 import os
+import pytz
+from datetime import datetime
 from flask import Flask, request, render_template, redirect, Response
-import utilities
+from flask_sqlalchemy import SQLAlchemy
+from flask_migrate import Migrate
 
 app = Flask(__name__)
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 app.config.from_object(os.environ['APP_SETTINGS'])
+db = SQLAlchemy(app)
+#migrate = Migrate(app, db)
+
+import utilities, db_ext, db_models
+
+@app.shell_context_processor
+def make_shell_context():
+    return {'db': db, 'UserEvents': db_models.UserEvents}
 
 @app.route('/', methods=['GET', 'POST'])
 def webhook():
@@ -33,6 +45,19 @@ def webhook():
                             utilities.postRequest("https://graph.facebook.com/v3.1/me/messages",
                                 {"recipient": {"id": str(sender_id)},
                                 "sender_action": "typing_on"})
+                            current_message_timestamp = messaging_event['timestamp']/1000
+                            last_message = db_ext.user_last_message(sender_id)
+                            utilities.log(last_message)
+                            if last_message:
+                                last_message_timestamp = datetime.timestamp(last_message[0])
+                                utilities.log(last_message_timestamp, current_message_timestamp)
+                                if current_message_timestamp == last_message_timestamp:
+                                    utilities.log("FB's multiple request for the same message detected!")
+                                    break
+                                else:
+                                    db_ext.insert_values(table="user_events", columns=["user_id", "time"], values=(
+                                        sender_id, datetime.fromtimestamp(current_message_timestamp).astimezone(
+                                            pytz.timezone('UTC'))))
                             if messaging_event.get("message") or messaging_event.get("postback"):  
                                 if messaging_event.get("postback"):
                                     attachment = utilities.handlePostback(messaging_event)
@@ -45,6 +70,7 @@ def webhook():
                                         attachment = utilities.handleFreeText(messaging_event)  
                                 if attachment:
                                     utilities.send_message(sender_id, attachment=attachment)
+                            # Save the message
                             if messaging_event.get("delivery"):  # delivery confirmation
                                 pass
                             if messaging_event.get("optin"):  # optin confirmation

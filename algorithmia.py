@@ -1,7 +1,10 @@
 import os
+import uuid
+import mimetypes
+import urllib
+import requests
 from PIL import Image
 from io import BytesIO
-import requests
 import Algorithmia
 
 def colorit(local_file=None, algorithmia_file=None, image_url=None, image_path=None):
@@ -36,9 +39,27 @@ def colorit(local_file=None, algorithmia_file=None, image_url=None, image_path=N
 	client = Algorithmia.client(os.environ['ALGORITHMIA_KEY']) #'simO4MIFDaoIWg4f+39XxO0yNyZ1'
 	algo = client.algo('deeplearning/ColorfulImageColorization/1.1.5')
 	result = algo.pipe(input).result  # Outputs the image url
+	print(result)
 	t800Bytes = client.file(result["output"]).getBytes()
 	if image_path:
-		Image.open(BytesIO(t800Bytes)).save(image_path)
+		if not os.path.exists("static/colored_images"):
+			os.mkdir("static/colored_images")
+			print('Directory Created')
+		else:
+			print("Directory Exists")
+		image_type = mimetypes.guess_type(urllib.parse.urlparse(result['output']).path)[0].split("/")[1]
+		file_name = "static/colored_images/" + uuid.uuid4().hex + '.%s' %image_type
+		while os.path.isfile(file_name):
+			print("File (%s) already exists" %file_name)
+			file_name = "static/colored_images/" + uuid.uuid4().hex + '.%s' %image_type
+		__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
+		image_path = os.path.join(__location__, file_name)
+		log(image_path)
+		try:
+			Image.open(BytesIO(t800Bytes)).save(image_path)
+			return file_name
+		except Exception as e:
+			print(str(e))
 	return
 
 '''

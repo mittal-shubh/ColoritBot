@@ -4,6 +4,7 @@
 #
 #    pip-compile --output-file requirements.txt requirements.in
 #
+alembic==1.0.7            # via flask-migrate
 algorithmia-api-client==1.0.1  # via algorithmia
 algorithmia==1.1.4
 certifi==2018.11.29       # via algorithmia-api-client, requests
@@ -11,15 +12,22 @@ chardet==3.0.4            # via requests
 click==6.6                # via flask
 enum34==1.1.6             # via algorithmia
 fbmessenger==5.3.2
+flask-migrate==2.4.0
+flask-script==2.0.6
+flask-sqlalchemy==2.3.2   # via flask-migrate
 flask==1.0
 gunicorn==19.9.0
 idna==2.8                 # via requests
 itsdangerous==0.24        # via flask
 jinja2==2.10              # via flask
-markupsafe==0.23          # via jinja2
+mako==1.0.7               # via alembic
+markupsafe==0.23          # via jinja2, mako
 pillow==5.4.1
-python-dateutil==2.7.5    # via algorithmia-api-client
+python-dateutil==2.7.5    # via alembic, algorithmia-api-client
+python-editor==1.0.4      # via alembic
+pytz==2018.9
 requests==2.21.0          # via algorithmia, fbmessenger
 six==1.12.0               # via algorithmia, algorithmia-api-client, python-dateutil
+sqlalchemy==1.2.18        # via alembic, flask-sqlalchemy
 urllib3==1.24.1           # via algorithmia-api-client, requests
 werkzeug==0.14.1          # via flask
