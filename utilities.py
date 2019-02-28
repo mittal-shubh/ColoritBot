@@ -53,7 +53,7 @@ def handleAttachments(messaging_event):
             if isinstance(result, str):
                 if result == "It's not a black & white image. Provide a black & white one.":
                     log(result)
-                    break
+                    attachment = {"text": "It is a colorful image! Provide a grayscale one."}
                 else:
                     attachment_id = upload_image(messaging_event['url']+result)
                     attachment = attachments.Image(attachment_id=attachment_id)

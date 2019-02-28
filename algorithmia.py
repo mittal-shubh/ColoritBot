@@ -10,6 +10,8 @@ import Algorithmia
 import utilities
 import ray
 
+client = Algorithmia.client(os.environ['ALGORITHMIA_KEY'])
+
 #@ray.remote
 def waiting_message(user_id):
 	if user_id:
@@ -110,7 +112,6 @@ def colorit(algorithm='deeplearning/ColorfulImageColorization/1.1.5', local_file
 	if color:
 		return "It's not a black & white image. Provide a black & white one."
 	try:
-		client = Algorithmia.client(os.environ['ALGORITHMIA_KEY'])
 		algo = client.algo(algorithm)
 		if user_id and image_path:
 			file_name = get_random_file_name(cwd_rsp_path="static/colored_images", image_type='png')
