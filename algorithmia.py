@@ -9,10 +9,10 @@ from io import BytesIO
 import Algorithmia
 import utilities
 import ray
+ray = ray.init()
 
 class parallel_processing:
 	def __init__(self, user_id, input):
-		self.ray = ray.init()
 		self.user_id = user_id
 		self.input = input
 
@@ -35,7 +35,7 @@ class parallel_processing:
 	def run(self):
 		result1 = waiting_message.remote()
 		result2 = runcoloritalgo.remote()
-		a, t800Bytes = self.ray.get([result1, result2])
+		a, t800Bytes = ray.get([result1, result2])
 		return t800Bytes
 
 def if_color(local_file=None, image_url=None, get_response=None):
