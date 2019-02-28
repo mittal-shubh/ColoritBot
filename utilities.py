@@ -33,7 +33,7 @@ def handlePostback(messaging_event):
     payload = messaging_event["postback"]["payload"]
     title = messaging_event["postback"]["title"]
     log(payload)
-    save_message(messaging_event["sender"]["id"], title, datetime.fromtimestamp(
+    save_message(str(messaging_event["sender"]["id"]), str(title), datetime.fromtimestamp(
         messaging_event['timestamp']/1000).astimezone(pytz.timezone('UTC')))
     attachment = {}
     return
@@ -47,7 +47,7 @@ def handleAttachments(messaging_event):
             pass
         elif file["type"] == "image":
             image_url = file['payload']['url']
-            save_message(messaging_event["sender"]["id"], image_url, datetime.fromtimestamp(
+            save_message(str(messaging_event["sender"]["id"]), str(image_url), datetime.fromtimestamp(
                 messaging_event['timestamp']/1000).astimezone(pytz.timezone('UTC')))
             result=algorithmia.colorit(image_url=image_url,image_path=True,user_id=messaging_event["sender"]["id"])
             if isinstance(result, str):
@@ -66,8 +66,8 @@ def handleAttachments(messaging_event):
 def handleFreeText(messaging_event):
     # Send back the message that you don't understand him but can definitely 
     # put colors in his b&w pictures. Send me the image.
-    message_text = messaging_event["message"]["text"] 
-    save_message(messaging_event["sender"]["id"], message_text, datetime.fromtimestamp(
+    message_text = str(messaging_event["message"]["text"]) 
+    save_message(str(messaging_event["sender"]["id"]), message_text, datetime.fromtimestamp(
         messaging_event['timestamp']/1000).astimezone(pytz.timezone('UTC')))
     attachment = {}
     if "text" in messaging_event["message"]:

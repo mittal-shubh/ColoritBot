@@ -38,12 +38,12 @@ def webhook():
                     if 'messaging' in entry:
                         for messaging_event in entry["messaging"]:
                             messaging_event['url'] = url
-                            sender_id = messaging_event["sender"]["id"]
+                            sender_id = str(messaging_event["sender"]["id"])
                             utilities.postRequest("https://graph.facebook.com/v3.1/me/messages",
-                                {"recipient": {"id": str(sender_id)},
+                                {"recipient": {"id": sender_id},
                                 "sender_action": "mark_seen"})
                             utilities.postRequest("https://graph.facebook.com/v3.1/me/messages",
-                                {"recipient": {"id": str(sender_id)},
+                                {"recipient": {"id": sender_id},
                                 "sender_action": "typing_on"})
                             current_message_timestamp = messaging_event['timestamp']/1000
                             last_message = db_ext.user_last_message(sender_id)
