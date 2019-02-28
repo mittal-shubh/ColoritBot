@@ -126,7 +126,7 @@ def save_message(user_id, message, time=None):
     return
 
 def send_message(user_id, attachment):
-    log("sending message to {recipient}: {text}".format(recipient=user_id, text=text))
+    log("sending message to {recipient}: {attachment}".format(recipient=user_id, attachment=attachment))
     url = "https://graph.facebook.com/v3.1/me/messages"
     dumpData = {"recipient": {"id": user_id}}
     dumpData["message"] = attachment
