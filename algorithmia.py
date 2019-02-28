@@ -19,7 +19,7 @@ def waiting_message(user_id):
 	return
 
 #@ray.remote
-def runcoloritalgo(input):
+def runcoloritalgo(algo, input):
 	result = algo.pipe(input).result  # Outputs the image url
 	print(result)
 	#image_type = mimetypes.guess_type(urllib.parse.urlparse(result['output']).path)[0].split("/")[1]
@@ -119,7 +119,7 @@ def colorit(algorithm='deeplearning/ColorfulImageColorization/1.1.5', local_file
 			#processor = parallel_processing(user_id, input)
 			#t800Bytes = processor.run()
 			waiting_message(user_id)
-			t800Bytes = runcoloritalgo(input)
+			t800Bytes = runcoloritalgo(algo, input)
 			Image.open(BytesIO(t800Bytes)).save(image_path)
 			return file_name
 		else:
