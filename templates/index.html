@@ -8,10 +8,10 @@
     <!-- For Resposive Device -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Jenn.AI - Your Digital Hotel-Attendant</title>
+    <title>ColorIt Bot - Let's colorify your world</title>
 
     <!-- Favicon -->
-    <link rel="icon" type="image/png" sizes="67x67" href="{{ url_for('static', filename='icon.png') }}">
+    <!-- link rel="icon" type="image/png" sizes="67x67" href="{{ url_for('static', filename='icon.png') }}"-->
 
 
     <!-- Main CSS style sheet -->
@@ -25,155 +25,12 @@
     <![endif]-->
 
     <!-- JS theme -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-    <script type="text/javascript">
-      var messages = []; //array that hold the record of each string in cha
-      var lastUserMessage = "", //keeps track of the most recent input string from the user
-        userName = "User"  //for now, it is 'User'
-        botMessage = "", //var keeps track of what the chatbot is going to say
-        botName = 'Sona', //name of the chatbot
-        botResponse = null,
-        talking = true; //when false the speach function doesn't work
-
-      //clears the placeholder text on the chatbox
-      //this function is set to run when the users brings focus to the chatbox, by clicking on it
-      function placeHolder() {
-        document.getElementById("chatbox").placeholder = "";
-      }
-
-      function doWork() {
-        // ajax the JSON to the server
-        var data = {};
-        data["message"] = {};
-        data["message"]["text"] = document.getElementById("chatbox").value;
-        console.log(data);
-        $.ajax({
-          type: "POST",
-          url: "/",
-          data: JSON.stringify(data),
-          dataType: 'json',
-          //timeout: 600000,
-          success: function (response) {
-            botResponse = response;
-            console.log(botResponse);
-            //add the chatbot's name and message to the array messages
-            messages.push("<b>" + botName + ":</b> " + botResponse.custom_intent + ', ' + botResponse.custom_entities);
-            for (var i = 1; i < 8; i++) {
-              if (messages[messages.length - i]) {
-                document.getElementById("chatlog" + i).innerHTML = messages[messages.length - i];
-              }
-            }
-            //alert("Success");
-          },
-          error: function (e) {
-            alert("Message is not sent");                
-          }
-        });
-        /*$.post("/", JSON.stringify(data), function() {alert( "success" );}).done(function() {alert( "second success" );}).fail(function() {alert( "Message is not sent" );});*/ 
-        // stop link reloading the page
-        event.preventDefault();
-      }
-
-      //edit this function to change what the chatbot says
-      function chatbotResponse() {
-        talking = true;
-        botMessage = "I'm confused"; //the default message
-        if (lastUserMessage == 'hi' || lastUserMessage =='hello') {
-          var hi = ['hi','howdy','hello'];
-          botMessage = hi[Math.floor(Math.random()*(hi.length))];
-        }
-        if (lastUserMessage == 'name') {
-          botMessage = 'My name is ' + botName;
-        }
-        //send lastUserMessage to the server
-        doWork();
-      }
-
-      //text to Speech
-      //https://developers.google.com/web/updates/2014/01/Web-apps-that-talk-Introduction-to-the-Speech-Synthesis-API
-      function Speech(say) {
-        if ('speechSynthesis' in window && talking) {
-          var utterance = new SpeechSynthesisUtterance(say);
-          //msg.voice = voices[10]; // Note: some voices don't support altering params
-          //msg.voiceURI = 'native';
-          //utterance.volume = 1; // 0 to 1
-          //utterance.rate = 0.1; // 0.1 to 10
-          //utterance.pitch = 1; //0 to 2
-          //utterance.text = 'Hello World';
-          //utterance.lang = 'en-US';
-          speechSynthesis.speak(utterance);
-        }
-      }
-
-      //this runs each time enter is pressed.
-      //It controls the overall input and output
-      function newEntry() {
-        //if the message from the user isn't empty then run 
-        if (document.getElementById("chatbox").value != "") {
-          //pulls the value from the chatbox ands sets it to lastUserMessage
-          lastUserMessage = document.getElementById("chatbox").value;
-          console.log(lastUserMessage);
-          //says what the user typed outloud
-          //Speech(lastUserMessage);
-          //sets the variables botMessage & botResponse in response to lastUserMessage
-          chatbotResponse();
-          //sets the chat box to be clear
-          document.getElementById("chatbox").value = "";
-          //adds the value of the chatbox to the array messages
-          messages.push("<b>" + userName + ":</b> " + lastUserMessage);
-          //says the message using the text to speech function written below
-          //Speech(botMessage);
-          //outputs the last few array elements of messages to html
-          for (var i = 1; i < 8; i++) {
-            if (messages[messages.length - i]) {
-              document.getElementById("chatlog" + i).innerHTML = messages[messages.length - i];
-            }
-          }
-        }
-      }
-
-      //if the key pressed is 'enter' runs the function newEntry()
-      function keyPress(e) {
-        var x = e || window.event;
-        var key = (x.keyCode || x.which);
-        if (key == 13 || key == 3) {
-          //runs this function when enter is pressed
-          newEntry();
-        }
-        if (key == 38) {
-          console.log('hi');
-          //document.getElementById("chatbox").value = lastUserMessage;
-        }
-      }
-
-      //runs the keypress() function when a key is pressed
-      console.log("Key is pressed!");
-      document.onkeypress = keyPress;
-    </script> 
+    <!-- script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script-->
     <!--script type="text/javascript" src="{{ url_for('static', filename='main.js') }}"></script--> 
   </head>
 
   <body>
     <div id='bodybox'>
-      <div id='chatborder'>
-        <p id="chatlog7" class="chattext">&nbsp;</p>
-        <p id="chatlog6" class="chattext">&nbsp;</p>
-        <p id="chatlog5" class="chattext">&nbsp;</p>
-        <p id="chatlog4" class="chattext">&nbsp;</p>
-        <p id="chatlog3" class="chattext">&nbsp;</p>
-        <p id="chatlog2" class="chattext">&nbsp;</p>
-        <p id="chatlog1" class="chattext">&nbsp;</p>
-        <input type="text" name="chat" id="chatbox" placeholder="Hi there! Type here to talk to me." onfocus="placeHolder()">
-      </div>
-      <br>
-      <br>
-      <h2>Build a Chatbot</h2>
-      <p>Write a program that responds to the user's text input.</p>
-      <ul style="list-style-type:disc">
-        <li>Input strings of text from the user.</li>
-        <li>Output different strings of text in response.</li>
-        <li>Here is my attempt:  <a href="https://codepen.io/lilgreenland/pen/zqXLeJ">notbot</a>
-      </ul>
       <center><img src="https://lilgreenland.github.io/images/BMO.jpg" align="middle"></center>
     </div>
   </body>
