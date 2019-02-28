@@ -6,6 +6,7 @@ import requests
 from PIL import Image
 from io import BytesIO
 import Algorithmia
+import utilities
 
 def colorit(local_file=None, algorithmia_file=None, image_url=None, image_path=None, user_id=None):
 	print("Coloring It")
@@ -65,7 +66,7 @@ def colorit(local_file=None, algorithmia_file=None, image_url=None, image_path=N
 			Image.open(BytesIO(t800Bytes)).save(image_path)
 			return file_name
 	except Exception as e:
-		print(str(e))
+		print('[Error]: '+str(e))
 	return
 
 '''
