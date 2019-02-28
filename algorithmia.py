@@ -14,7 +14,7 @@ import ray
 def waiting_message(user_id):
 	if user_id:
 		utilities.send_message(user_id, {"text": "It is coming!"})
-		time.sleep(2)
+		time.sleep(1.5)
 		utilities.send_message(user_id, {"text": "I beg you few more seconds."})
 	return
 
@@ -116,8 +116,10 @@ def colorit(algorithm='deeplearning/ColorfulImageColorization/1.1.5', local_file
 			file_name = get_random_file_name(cwd_rsp_path="static/colored_images", image_type='png')
 			image_path=os.path.join(os.path.realpath(os.path.join(os.getcwd(),os.path.dirname(__file__))),file_name)
 			print(image_path)
-			processor = parallel_processing(user_id, input)
-			t800Bytes = processor.run()
+			#processor = parallel_processing(user_id, input)
+			#t800Bytes = processor.run()
+			waiting_message(user_id)
+			t800Bytes = runcoloritalgo(input)
 			Image.open(BytesIO(t800Bytes)).save(image_path)
 			return file_name
 		else:
