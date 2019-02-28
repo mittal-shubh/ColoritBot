@@ -46,11 +46,11 @@ def handleAttachments(messaging_event):
         elif file["type"] == "image":
             image_url = file['payload']['url']
             image_type = mimetypes.guess_type(urllib.parse.urlparse(image_url).path)[0].split("/")[1]
-            if not os.path.exists("colored_images"):
-                os.mkdir("colored_images")
-            file_name = "colored_images/" + uuid.uuid4().hex + '.%s' %image_type
+            if not os.path.exists("static/colored_images"):
+                os.mkdir("static/colored_images")
+            file_name = "static/colored_images/" + uuid.uuid4().hex + '.%s' %image_type
             while os.path.isfile(file_name):
-                file_name = "colored_images/" + uuid.uuid4().hex + '.%s' %image_type
+                file_name = "static/colored_images/" + uuid.uuid4().hex + '.%s' %image_type
             image_path = os.path.join(__location__, file_name)
             log(image_path)
             result = algorithmia.colorit(image_url=image_url, image_path=image_path)
