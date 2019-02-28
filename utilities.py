@@ -30,7 +30,7 @@ def handlePostback(messaging_event):
     payload = messaging_event["postback"]["payload"]
     title = messaging_event["postback"]["title"]
     log(payload)
-    utilities.save_message(messaging_event["sender"]["id"], title, datetime.fromtimestamp(
+    save_message(messaging_event["sender"]["id"], title, datetime.fromtimestamp(
         messaging_event['timestamp']/1000).astimezone(pytz.timezone('UTC')))
     attachment = {}
     return
