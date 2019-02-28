@@ -32,9 +32,9 @@ class parallel_processing:
 		self.input = input
 
 	def run(self):
+		ray.init()
 		result1 = waiting_message.remote(self.user_id)
 		result2 = runcoloritalgo.remote(self.input)
-		ray = ray.init()
 		a, t800Bytes = ray.get([result1, result2])
 		return t800Bytes
 
