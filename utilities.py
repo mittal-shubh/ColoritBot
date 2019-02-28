@@ -6,6 +6,7 @@ import re
 import requests
 from datetime import datetime
 import pytz
+from psycopg2 import sql
 import fbmessenger
 from fbmessenger import attachments, templates, elements
 from fbmessenger.thread_settings import PersistentMenu, PersistentMenuItem, MessengerProfile
