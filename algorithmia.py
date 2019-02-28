@@ -1,3 +1,4 @@
+import os
 from PIL import Image
 from io import BytesIO
 import requests
@@ -18,6 +19,7 @@ def colorit(local_file=None, algorithmia_file=None, image_url=None, image_path=N
 		im = Image.open(BytesIO(image)).convert('RGB')
 		pix = im.load()
 		image_size = im.size
+		print(image_size)
 		diff = 0
 		for w in range(image_size[0]):
 			for h in range(image_size[1]):
@@ -26,7 +28,9 @@ def colorit(local_file=None, algorithmia_file=None, image_url=None, image_path=N
 				gb = abs(g-b)
 				br = abs(b-r)
 				diff += rg+gb+br
+		print(diff)
 		color_factor = float(diff)/(image_size[0]*image_size[1])
+	print(color_factor)
 	if round(color_factor) != 0:
 		return "It's not a black & white image. Provide a black & white one."
 	client = Algorithmia.client(os.environ['ALGORITHMIA_KEY']) #'simO4MIFDaoIWg4f+39XxO0yNyZ1'
