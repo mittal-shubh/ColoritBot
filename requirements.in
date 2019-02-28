@@ -6,3 +6,4 @@ fbmessenger
 Pillow
 Algorithmia
 pytz
+psycopg2
