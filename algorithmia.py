@@ -10,7 +10,7 @@ import Algorithmia
 import utilities
 import ray
 
-@ray.remote
+#@ray.remote
 def waiting_message(user_id):
 	if user_id:
 		utilities.send_message(user_id, {"text": "It is coming!"})
@@ -18,7 +18,7 @@ def waiting_message(user_id):
 		utilities.send_message(user_id, {"text": "I beg you few more seconds."})
 	return
 
-@ray.remote
+#@ray.remote
 def runcoloritalgo(input):
 	result = algo.pipe(input).result  # Outputs the image url
 	print(result)
