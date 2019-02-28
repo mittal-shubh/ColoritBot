@@ -7,8 +7,7 @@ import requests
 from datetime import datetime
 import pytz
 from psycopg2 import sql
-import fbmessenger
-from fbmessenger import attachments, templates, elements
+from fbmessenger import MessengerClient, attachments, templates, elements
 from fbmessenger.thread_settings import PersistentMenu, PersistentMenuItem, MessengerProfile
 import algorithmia
 import db_ext
@@ -22,9 +21,11 @@ def classify(message_text):
     return
 
 def upload_image(url):
+    log(url)
     attachment = attachments.Image(url=url, is_reusable=True)
     client = MessengerClient(page_access_token=os.environ['PAGE_ACCESS_TOKEN'])
     res = client.upload_attachment(attachment)
+    log(res)
     return res['attachment_id']
 
 def handlePostback(messaging_event):
@@ -55,7 +56,6 @@ def handleAttachments(messaging_event):
                     break
                 else:
                     attachment_id = upload_image(messaging_event['url']+result)
-                    log(attachment_id)
                     btn = elements.Button(
                         button_type='web_url',
                         title='Web button',
