@@ -83,10 +83,10 @@ def get_random_file_name(full_path=None, cwd_rsp_path=None, image_type='png'):
 		print('Directory Created')
 	else:
 		print("Directory Exists")
-	file_name = fp + uuid.uuid4().hex + '.%s' %image_type
+	file_name = fp + '/' + uuid.uuid4().hex + '.%s' %image_type
 	while os.path.isfile(file_name):
 		print("File (%s) already exists" %file_name)
-		file_name = fp + uuid.uuid4().hex + '.%s' %image_type
+		file_name = fp + '/' + uuid.uuid4().hex + '.%s' %image_type
 	return file_name
 
 def colorit(algorithm='deeplearning/ColorfulImageColorization/1.1.5', local_file=None, algorithmia_file=None, 
@@ -117,7 +117,7 @@ def colorit(algorithm='deeplearning/ColorfulImageColorization/1.1.5', local_file
 			image_path=os.path.join(os.path.realpath(os.path.join(os.getcwd(),os.path.dirname(__file__))),file_name)
 			print(image_path)
 			processor = parallel_processing(user_id, input)
-			t800Bytes = parallel_processing.run()
+			t800Bytes = processor.run()
 			Image.open(BytesIO(t800Bytes)).save(image_path)
 			return file_name
 		else:
