@@ -50,7 +50,7 @@ def colorit(local_file=None, algorithmia_file=None, image_url=None, image_path=N
 			file_name = "static/colored_images/" + uuid.uuid4().hex + '.%s' %image_type
 		__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 		image_path = os.path.join(__location__, file_name)
-		log(image_path)
+		print(image_path)
 	client = Algorithmia.client(os.environ['ALGORITHMIA_KEY']) #'simO4MIFDaoIWg4f+39XxO0yNyZ1'
 	algo = client.algo('deeplearning/ColorfulImageColorization/1.1.5')
 	result = algo.pipe(input).result  # Outputs the image url
