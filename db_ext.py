@@ -287,15 +287,5 @@ def bot_prev_message(user_id, size=None):
 def user_last_message(user_id):
     query = sql.SQL('SELECT {cols} FROM user_events WHERE {ukey1} = %s ORDER BY {okey} DESC;').format(
         cols=sql.Identifier('time'), ukey1=sql.Identifier('user_id'), okey=sql.Identifier('time'))
-    last_message = fetch_column(query=query, var=(user_id, 'received'))
+    last_message = fetch_column(query=query, var=(user_id))
     return last_message
-
-def get_current_order(user_id):
-    current_order = fetch_column('users', columns=list(['current_order']), unique_key='user_id', 
-        unique_val=user_id)[0]
-    return current_order
-
-def get_current_booking(user_id):
-    current_booking = fetch_column('users', columns=list(['current_booking']), unique_key='user_id', 
-            unique_val=user_id)[0]
-    return current_booking
