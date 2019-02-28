@@ -130,7 +130,7 @@ def send_message(user_id, attachment):
     url = "https://graph.facebook.com/v3.1/me/messages"
     dumpData = {"recipient": {"id": user_id}}
     dumpData["message"] = attachment
-    time.sleep(len(text)/100)
+    #time.sleep(len(text)/100)
     postRequest(url, dumpData)
 
 def get_part_of_day(hour):
