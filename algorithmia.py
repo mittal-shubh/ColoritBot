@@ -7,7 +7,7 @@ from PIL import Image
 from io import BytesIO
 import Algorithmia
 
-def colorit(local_file=None, algorithmia_file=None, image_url=None, image_path=None):
+def colorit(local_file=None, algorithmia_file=None, image_url=None, image_path=None, user_id=None):
 	if local_file:
 		image = local_file
 		input = bytearray(open(local_file, "rb").read())
@@ -16,10 +16,10 @@ def colorit(local_file=None, algorithmia_file=None, image_url=None, image_path=N
 	if image_url:
 		# Try this: https://scontent.xx.fbcdn.net/v/t1.15752-9/52297953_405991800162283_7056520676215095296_n.jpg?_nc_cat=111&_nc_ad=z-m&_nc_cid=0&_nc_zor=9&_nc_ht=scontent.xx&oh=4a1c6de3a6614aa21f5fe8e20e84f43b&oe=5CE4CA2D
 		response = requests.get(image_url)
-		image = response.content
+		image = BytesIO(response.content)
 		input = bytearray(image)
 	if not algorithmia_file:
-		im = Image.open(BytesIO(image)).convert('RGB')
+		im = Image.open(image).convert('RGB')
 		pix = im.load()
 		image_size = im.size
 		print(image_size)
@@ -51,17 +51,21 @@ def colorit(local_file=None, algorithmia_file=None, image_url=None, image_path=N
 		__location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
 		image_path = os.path.join(__location__, file_name)
 		print(image_path)
-	client = Algorithmia.client(os.environ['ALGORITHMIA_KEY']) #'simO4MIFDaoIWg4f+39XxO0yNyZ1'
+	client = Algorithmia.client(os.environ['ALGORITHMIA_KEY'])
 	algo = client.algo('deeplearning/ColorfulImageColorization/1.1.5')
-	result = algo.pipe(input).result  # Outputs the image url
-	print(result)
-	t800Bytes = client.file(result["output"]).getBytes()
-	if image_path:
-		try:
+	try:
+		if user_id:
+			utilities.send_message(user_id, {"text": "It is coming!"})
+			time.sleep(5)
+			utilities.send_message(user_id, {"text": "I beg you few more seconds."})
+		result = algo.pipe(input).result  # Outputs the image url
+		print(result)
+		t800Bytes = client.file(result["output"]).getBytes()
+		if image_path:
 			Image.open(BytesIO(t800Bytes)).save(image_path)
 			return file_name
-		except Exception as e:
-			print(str(e))
+	except Exception as e:
+		print(str(e))
 	return
 
 '''

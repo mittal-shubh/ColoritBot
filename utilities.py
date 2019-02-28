@@ -49,20 +49,15 @@ def handleAttachments(messaging_event):
             image_url = file['payload']['url']
             save_message(messaging_event["sender"]["id"], image_url, datetime.fromtimestamp(
                 messaging_event['timestamp']/1000).astimezone(pytz.timezone('UTC')))
-            result = algorithmia.colorit(image_url=image_url, image_path=True)
+            result=algorithmia.colorit(image_url=image_url,image_path=True,user_id=messaging_event["sender"]["id"])
             if isinstance(result, str):
                 if result == "It's not a black & white image. Provide a black & white one.":
                     log(result)
                     break
                 else:
                     attachment_id = upload_image(messaging_event['url']+result)
-                    btn = elements.Button(
-                        button_type='web_url',
-                        title='Web button',
-                        url='http://facebook.com'
-                        )
                     attachment = attachments.Image(attachment_id=attachment_id)
-                    res = templates.MediaTemplate(attachment, buttons=[btn])
+                    res = templates.MediaTemplate(attachment)
                     attachment = res.to_dict()
         else:
             pass
