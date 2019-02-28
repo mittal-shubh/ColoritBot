@@ -117,7 +117,8 @@ def save_message(user_id, message, time=None):
         col=sql.Identifier('id'), ukey1=sql.Identifier('user_id'), ukey2=sql.Identifier('time'))
     message_id = db_ext.fetch_column(query=query, var=(user_id, time))
     if message_id:
-        db_ext.update_columns('user_events', 'id', message_id[0], list(['message', message]))
+        #db_ext.update_columns('user_events', 'id', message_id[0], list(['message', message]))
+        pass
     else:
         db_ext.insert_values(table="user_events", columns=["user_id", "time"], values=(user_id, time))
         save_message(user_id, message, time)
