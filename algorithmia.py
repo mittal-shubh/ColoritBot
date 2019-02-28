@@ -9,7 +9,6 @@ from io import BytesIO
 import Algorithmia
 import utilities
 import ray
-ray = ray.init()
 
 @ray.remote
 def waiting_message(user_id):
@@ -35,6 +34,7 @@ class parallel_processing:
 	def run(self):
 		result1 = waiting_message.remote(self.user_id)
 		result2 = runcoloritalgo.remote(self.input)
+		ray = ray.init()
 		a, t800Bytes = ray.get([result1, result2])
 		return t800Bytes
 
